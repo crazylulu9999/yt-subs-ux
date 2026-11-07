@@ -1,0 +1,191 @@
+/* ===== 이모티콘 순서 커스텀 ===== */
+
+.ytec-flex {
+  display: flex !important;
+  flex-wrap: wrap !important;
+}
+
+/* 제목 줄: [제목 텍스트(줄바꿈)] [⇅ 순서] */
+.ytec-title-row {
+  display: flex !important;
+  align-items: center;
+  gap: 6px;
+}
+
+.ytec-edit-btn {
+  /* 유튜브가 카테고리 제목(#title)에 pointer-events: none을 줘서 상속되므로 되살린다 */
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 1;
+  flex: none;
+  margin-left: auto;
+  text-transform: none;
+  letter-spacing: normal;
+  white-space: nowrap;
+  padding: 1px 6px;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+  border-radius: 10px;
+  /* 유튜브 테마 변수는 영역마다 값이 달라(제목 줄 배경과 대비가 깨짐) 고정색 사용 */
+  background: #fff;
+  color: #0f0f0f;
+  font: 500 11px/16px Roboto, Arial, sans-serif;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.15s, background-color 0.15s;
+}
+yt-emoji-picker-category-renderer:hover .ytec-edit-btn,
+.ytec-edit-btn:focus-visible {
+  opacity: 1;
+}
+.ytec-edit-btn:hover {
+  opacity: 1;
+  background: #065fd4;
+  border-color: #065fd4;
+  color: #fff;
+}
+
+/* ---- editor ---- */
+.ytec-overlay {
+  --ytec-bg: #fff;
+  --ytec-fg: #0f0f0f;
+  --ytec-sub: #606060;
+  --ytec-line: rgba(0, 0, 0, 0.12);
+  --ytec-cell: rgba(0, 0, 0, 0.05);
+  --ytec-accent: #065fd4;
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.5);
+  font-family: Roboto, Arial, sans-serif;
+}
+html[dark] .ytec-overlay,
+html.ytx-dark .ytec-overlay {
+  --ytec-bg: #212121;
+  --ytec-fg: #f1f1f1;
+  --ytec-sub: #aaa;
+  --ytec-line: rgba(255, 255, 255, 0.14);
+  --ytec-cell: rgba(255, 255, 255, 0.07);
+  --ytec-accent: #3ea6ff;
+}
+
+.ytec-modal {
+  display: flex;
+  flex-direction: column;
+  width: min(560px, 100%);
+  max-height: min(640px, 100%);
+  border-radius: 12px;
+  background: var(--ytec-bg);
+  color: var(--ytec-fg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+}
+
+.ytec-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px 4px;
+}
+.ytec-title {
+  flex: 1;
+  min-width: 0;
+  font-size: 15px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ytec-x {
+  border: 0;
+  background: none;
+  color: var(--ytec-sub);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 50%;
+}
+.ytec-x:hover {
+  background: var(--ytec-cell);
+}
+
+.ytec-hint {
+  padding: 0 14px 8px;
+  font-size: 12px;
+  color: var(--ytec-sub);
+}
+
+.ytec-grid {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  gap: 4px;
+  padding: 8px 14px;
+  overflow-y: auto;
+  min-height: 80px;
+  border-top: 1px solid var(--ytec-line);
+  border-bottom: 1px solid var(--ytec-line);
+}
+
+.ytec-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--ytec-cell);
+  cursor: grab;
+  user-select: none;
+}
+.ytec-item:hover {
+  outline: 2px solid var(--ytec-accent);
+}
+.ytec-item img {
+  width: 32px;
+  height: 32px;
+  pointer-events: none;
+}
+.ytec-item.ytec-dragging {
+  opacity: 0.3;
+  outline: 2px dashed var(--ytec-accent);
+}
+
+.ytec-local {
+  padding: 8px 14px 0;
+  font-size: 11px;
+  color: var(--ytec-sub);
+}
+
+.ytec-foot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+}
+.ytec-spacer {
+  flex: 1;
+}
+.ytec-btn {
+  padding: 7px 14px;
+  border: 0;
+  border-radius: 18px;
+  background: var(--ytec-cell);
+  color: var(--ytec-fg);
+  font: 500 13px Roboto, Arial, sans-serif;
+  cursor: pointer;
+}
+.ytec-btn:hover {
+  filter: brightness(0.95);
+}
+.ytec-primary {
+  background: var(--ytec-accent);
+  color: #fff;
+}
+html[dark] .ytec-primary,
+html.ytx-dark .ytec-primary {
+  color: #0f0f0f;
+}

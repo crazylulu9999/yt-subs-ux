@@ -1,0 +1,497 @@
+/* ===== 이모티콘 관용구 ===== */
+
+.ytph-cat,
+.ytph-overlay,
+.ytph-menu,
+.ytph-toast {
+  --ph-bg: #fff;
+  --ph-fg: #0f0f0f;
+  --ph-sub: #606060;
+  --ph-line: rgba(0, 0, 0, 0.12);
+  --ph-cell: rgba(0, 0, 0, 0.06);
+  --ph-cell-hover: rgba(0, 0, 0, 0.12);
+  --ph-accent: #065fd4;
+  --ph-accent-fg: #fff;
+  --ph-danger: #cc0000;
+  font-family: Roboto, Arial, sans-serif;
+}
+html[dark] .ytph-cat,
+html.ytx-dark .ytph-cat,
+html[dark] .ytph-overlay,
+html.ytx-dark .ytph-overlay,
+html[dark] .ytph-menu,
+html.ytx-dark .ytph-menu,
+html[dark] .ytph-toast,
+html.ytx-dark .ytph-toast {
+  --ph-bg: #212121;
+  --ph-fg: #f1f1f1;
+  --ph-sub: #aaa;
+  --ph-line: rgba(255, 255, 255, 0.14);
+  --ph-cell: rgba(255, 255, 255, 0.08);
+  --ph-cell-hover: rgba(255, 255, 255, 0.16);
+  --ph-accent: #3ea6ff;
+  --ph-accent-fg: #0f0f0f;
+  --ph-danger: #ff4e45;
+}
+
+/* ---- 칩 목록 ---- */
+.ytph-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  max-height: 64px;
+  overflow-y: auto;
+}
+.ytph-sep {
+  width: 1px;
+  align-self: stretch;
+  margin: 2px 2px;
+  background: var(--ph-line);
+}
+.ytph-empty {
+  color: var(--ph-sub);
+  font-size: 12px;
+  padding: 2px 4px;
+}
+
+.ytph-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 100%;
+  height: 26px;
+  padding: 0 8px;
+  border: 1px solid transparent;
+  border-radius: 13px;
+  background: var(--ph-cell);
+  color: var(--ph-fg);
+  font: 400 13px Roboto, Arial, sans-serif;
+  cursor: pointer;
+  overflow: hidden;
+}
+.ytph-chip:hover {
+  background: var(--ph-cell-hover);
+}
+.ytph-chip.ytph-global {
+  border-color: var(--ph-line);
+  background: none;
+}
+.ytph-chip.ytph-dragging {
+  opacity: 0.35;
+}
+.ytph-name {
+  font-weight: 500;
+  white-space: nowrap;
+  max-width: 7em;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ytph-name + .ytph-prev {
+  opacity: 0.85;
+}
+
+.ytph-prev {
+  display: inline-flex;
+  align-items: center;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 14em;
+}
+.ytph-emo {
+  width: 20px;
+  height: 20px;
+  flex: none;
+  vertical-align: middle;
+}
+.ytph-txt {
+  white-space: pre;
+}
+
+/* ---- 선택창 안: 카테고리 탭 버튼 ---- */
+.ytph-cat-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 50%;
+  flex: none;
+  background: none;
+  color: inherit;
+  cursor: pointer;
+  pointer-events: auto !important;
+  vertical-align: middle;
+  box-sizing: border-box;
+}
+.ytph-cat-tab:hover {
+  background: rgba(127, 127, 127, 0.2);
+}
+
+/* ---- 선택창 안: 관용구 섹션 ---- */
+.ytph-cat {
+  display: block;
+  margin-bottom: 4px;
+  color: var(--ph-fg);
+  font-size: 12px;
+}
+.ytph-cat-title {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  background: var(--ph-bg);
+  color: var(--ph-sub);
+  font: 500 13px/18px Roboto, Arial, sans-serif;
+}
+.ytph-cat-name {
+  flex: 1;
+}
+.ytph-cat-add {
+  flex: none;
+  padding: 1px 8px;
+  border: 1px solid var(--ph-line);
+  border-radius: 10px;
+  background: none;
+  color: var(--ph-fg);
+  font: 500 11px/16px Roboto, Arial, sans-serif;
+  cursor: pointer;
+  pointer-events: auto !important;
+}
+.ytph-cat-add:hover {
+  background: var(--ph-cell-hover);
+}
+.ytph-cat .ytph-list {
+  max-height: none;
+  overflow: visible;
+  padding: 4px 8px 6px;
+}
+.ytph-cat .ytph-chip {
+  pointer-events: auto !important;
+}
+
+/* ---- star on messages ---- */
+.ytph-msg {
+  position: relative;
+}
+.ytph-star {
+  position: absolute;
+  right: 30px;
+  top: 4px;
+  z-index: 2;
+  display: none;
+  width: 22px;
+  height: 22px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.55);
+  color: #ffd54f;
+  font-size: 14px;
+  line-height: 22px;
+  cursor: pointer;
+}
+.ytph-msg:hover > .ytph-star {
+  display: block;
+}
+.ytph-star:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+/* ---- menu ---- */
+.ytph-menu {
+  position: fixed;
+  z-index: 2147483001;
+  display: flex;
+  flex-direction: column;
+  min-width: 120px;
+  padding: 4px 0;
+  border-radius: 8px;
+  background: var(--ph-bg);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+.ytph-menu button {
+  border: 0;
+  background: none;
+  color: var(--ph-fg);
+  text-align: left;
+  padding: 7px 14px;
+  font: 400 13px Roboto, Arial, sans-serif;
+  cursor: pointer;
+}
+.ytph-menu button:hover {
+  background: var(--ph-cell);
+}
+.ytph-menu .ytph-danger {
+  color: var(--ph-danger);
+}
+
+/* ---- dialog ---- */
+.ytph-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.5);
+}
+.ytph-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: min(520px, 100%);
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 14px;
+  border-radius: 12px;
+  background: var(--ph-bg);
+  color: var(--ph-fg);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  font-size: 13px;
+}
+.ytph-mtitle {
+  font-size: 15px;
+  font-weight: 500;
+}
+.ytph-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.ytph-lbl {
+  flex: none;
+  width: 32px;
+  color: var(--ph-sub);
+  font-size: 12px;
+}
+.ytph-lbl-block {
+  width: auto;
+}
+.ytph-hint {
+  margin: -4px 0 0 38px;
+  color: var(--ph-sub);
+  font-size: 11px;
+}
+.ytph-hint:empty {
+  display: none;
+}
+.ytph-input {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--ph-line);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ph-fg);
+  font: 400 13px Roboto, Arial, sans-serif;
+  outline: none;
+}
+.ytph-input:focus {
+  border-color: var(--ph-accent);
+}
+
+.ytph-seg {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+.ytph-segbtn {
+  padding: 5px 10px;
+  border: 1px solid var(--ph-line);
+  border-radius: 14px;
+  background: none;
+  color: var(--ph-fg);
+  font: 400 12px Roboto, Arial, sans-serif;
+  cursor: pointer;
+}
+.ytph-segbtn.ytph-on {
+  border-color: var(--ph-accent);
+  background: var(--ph-accent);
+  color: var(--ph-accent-fg);
+}
+.ytph-segbtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ytph-tokens {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  min-height: 36px;
+  max-height: 160px;
+  overflow-y: auto;
+  padding: 6px;
+  border: 1px solid var(--ph-line);
+  border-radius: 8px;
+}
+.ytph-tok {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 2px 2px 6px;
+  border-radius: 6px;
+  background: var(--ph-cell);
+  cursor: grab;
+}
+.ytph-tok .ytph-emo {
+  width: 24px;
+  height: 24px;
+}
+.ytph-tokx {
+  border: 0;
+  background: none;
+  color: var(--ph-sub);
+  font-size: 11px;
+  cursor: pointer;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+.ytph-tokx:hover {
+  color: var(--ph-danger);
+}
+
+.ytph-local {
+  color: var(--ph-sub);
+  font-size: 11px;
+}
+
+.ytph-foot {
+  display: flex;
+  gap: 8px;
+  margin-top: 4px;
+}
+.ytph-spacer {
+  flex: 1;
+}
+.ytph-btn {
+  flex: none;
+  padding: 6px 12px;
+  border: 0;
+  border-radius: 16px;
+  background: var(--ph-cell);
+  color: var(--ph-fg);
+  font: 500 12px Roboto, Arial, sans-serif;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.ytph-btn:hover {
+  background: var(--ph-cell-hover);
+}
+.ytph-primary,
+.ytph-primary:hover {
+  background: var(--ph-accent);
+  color: var(--ph-accent-fg);
+}
+
+/* ---- toast ---- */
+.ytph-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 80px;
+  z-index: 2147483002;
+  transform: translateX(-50%);
+  padding: 8px 14px;
+  border-radius: 6px;
+  background: #323232;
+  color: #fff;
+  font-size: 13px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.ytph-toast.ytph-show {
+  opacity: 1;
+}
+
+/* ---- 팝업 이모티콘 팔레트 ---- */
+.ytph-pal {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 8px;
+  border: 1px solid var(--ph-line);
+  border-radius: 8px;
+}
+.ytph-pal-tabs {
+  display: flex;
+  gap: 2px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.ytph-pal-tab {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: none;
+  color: var(--ph-sub);
+  cursor: pointer;
+}
+.ytph-pal-tab:hover {
+  background: var(--ph-cell-hover);
+}
+.ytph-pal-tab img {
+  width: 20px;
+  height: 20px;
+}
+.ytph-pal-grid {
+  position: relative; /* 탭 클릭 시 offsetTop 기준 */
+  height: 220px;
+  overflow-y: auto;
+}
+.ytph-pal-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 4px 2px;
+  background: var(--ph-bg);
+  color: var(--ph-sub);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.ytph-pal-cells {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(36px, 1fr));
+  gap: 2px;
+  margin-bottom: 6px;
+}
+.ytph-pal-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  cursor: pointer;
+}
+.ytph-pal-cell:hover {
+  background: var(--ph-cell-hover);
+}
+.ytph-pal-cell img {
+  width: 28px;
+  height: 28px;
+}
+.ytph-pal-phrases {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 6px;
+}

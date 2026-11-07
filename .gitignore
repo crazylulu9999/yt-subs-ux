@@ -1,0 +1,18 @@
+# 개발용 HTML 샘플 — 다른 시청자의 닉네임·채팅·프로필 이미지가 들어 있으므로 절대 커밋하지 않는다
+sample*.txt
+sample*.html
+
+# 로컬 도구 설정
+.claude/
+.vscode/
+.idea/
+
+# 패키징 결과물
+*.zip
+*.crx
+*.pem
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini

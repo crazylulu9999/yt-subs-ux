@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "yt-subs-ux",
+  "version": "0.1.0",
+  "description": "유튜브 이모티콘 순서 커스텀, 이모티콘 관용구(탄막) 등록.",
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": ["https://www.youtube.com/*"],
+      "js": ["content/theme.js", "content/emoji-order.js", "content/phrases.js"],
+      "css": ["content/emoji-order.css", "content/phrases.css"],
+      "all_frames": true,
+      "run_at": "document_idle"
+    }
+  ]
+}
