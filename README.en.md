@@ -15,13 +15,13 @@ This is an unofficial project and is not affiliated with or endorsed by Google L
 </p>
 <p align="center"><sub>Reorder channel emojis · Save a danmaku from chat and send it · Make a phrase with the emoji palette<br>Demos use a fictional channel, viewers and emojis.</sub></p>
 
-> The extension's own UI (buttons, dialogs) is currently in Korean only.
+> The extension's UI follows YouTube's display language: Korean, Japanese, or English (English for any other language).
 
 ## Features
 
 ### Emoji order
 
-Use the **`⇅ 순서`** (Order) button next to each category title in the emoji picker.
+Use the **`⇅ Order`** button next to each category title in the emoji picker.
 
 - Drag to reorder. Double-click moves an emoji to the front, Alt+click to the end.
 - Channel member emojis are saved **per channel**.
@@ -32,14 +32,14 @@ Use the **`⇅ 순서`** (Order) button next to each category title in the emoji
 
 Save emoji combos or the danmaku a channel's viewers share (for example `🥀🎶🥀🎶🥀🎶`), and enter them with one click.
 
-- A **phrases** category (speech-bubble tab) is added as the second category of the emoji picker.
+- A **Phrases** category (speech-bubble tab) is added as the second category of the emoji picker.
   - Click: enter the phrase in the chat input
   - Right-click: edit / copy as text / delete
   - Drag: reorder
 - **Adding phrases**
   - Hover over a chat message and click **☆** to save that message as a phrase.
-  - Click **`+ 추가`** (Add) in the phrases category to write one in a popup, with an emoji palette (category tabs and search) and text input. You can also append existing phrases from the palette.
-- **Scope**: `이 채널 전용` (this channel only, default) or `모든 채널 공용` (all channels). Phrases that contain channel member emojis can only be saved for that channel.
+  - Click **`+ Add`** in the phrases category to write one in a popup, with an emoji palette (category tabs and search) and text input. You can also append existing phrases from the palette.
+- **Scope**: `This channel only` (default) or `All channels`. Phrases that contain channel member emojis can only be saved for that channel.
 - Emojis are entered through YouTube's own emoji picker, so they are sent the same way as emojis you pick yourself.
 
 ## Install
@@ -67,7 +67,9 @@ To update, replace the files, click the reload (↻) button for this extension i
 
 ```
 manifest.json            Extension settings (Manifest V3)
+_locales/                Extension name and description (ko/ja/en)
 content/
+  i18n.js                UI strings (Korean, Japanese, English)
   theme.js               Dark mode detection (<html class="ytx-dark">)
   emoji-order.js / .css  Emoji order
   phrases.js / .css      Emoji phrases (danmaku)
