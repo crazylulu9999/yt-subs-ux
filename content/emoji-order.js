@@ -8,6 +8,7 @@
 //   - 일반 유니코드 카테고리: "g:<기본 순서상 첫 이모티콘>"
 (() => {
   'use strict';
+  const { t } = globalThis.ytxI18n; // content/i18n.js
 
   const STORE_KEY = 'emojiOrder'; // { [categoryKey]: string[] (emoji keys) }
   const CAT_SEL = 'yt-emoji-picker-category-renderer';
@@ -62,7 +63,7 @@
   }
 
   function categoryTitle(renderer) {
-    return renderer.getAttribute('aria-label') || '이모티콘';
+    return renderer.getAttribute('aria-label') || t('emoji');
   }
 
   /** 저장된 순서를 반영한 정렬 결과 (저장 목록에 없는 새 이모티콘은 기본 순서대로 뒤에) */
@@ -111,8 +112,8 @@
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'ytec-edit-btn';
-    btn.textContent = '⇅ 순서';
-    btn.title = '이 카테고리의 이모티콘 순서 편집';
+    btn.textContent = t('orderButton');
+    btn.title = t('orderButtonTitle');
     btn.addEventListener('click', (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -156,16 +157,16 @@
       <div class="ytec-modal" role="dialog" aria-modal="true">
         <div class="ytec-head">
           <span class="ytec-title"></span>
-          <button type="button" class="ytec-x" aria-label="닫기">✕</button>
+          <button type="button" class="ytec-x" aria-label="${t('close')}">✕</button>
         </div>
-        <div class="ytec-hint">드래그해서 순서를 바꾸세요 · 더블클릭: 맨 앞으로 · Alt+클릭: 맨 뒤로</div>
+        <div class="ytec-hint">${t('orderHint')}</div>
         <div class="ytec-grid" role="list"></div>
-        <div class="ytec-local">💾 순서는 이 브라우저에만(로컬) 저장되며 다른 PC·브라우저와 동기화되지 않습니다.</div>
+        <div class="ytec-local">${t('orderLocal')}</div>
         <div class="ytec-foot">
-          <button type="button" class="ytec-btn ytec-reset">기본 순서</button>
+          <button type="button" class="ytec-btn ytec-reset">${t('orderReset')}</button>
           <span class="ytec-spacer"></span>
-          <button type="button" class="ytec-btn ytec-cancel">취소</button>
-          <button type="button" class="ytec-btn ytec-primary ytec-save">저장</button>
+          <button type="button" class="ytec-btn ytec-cancel">${t('cancel')}</button>
+          <button type="button" class="ytec-btn ytec-primary ytec-save">${t('save')}</button>
         </div>
       </div>`;
     overlay.querySelector('.ytec-title').textContent = categoryTitle(renderer);

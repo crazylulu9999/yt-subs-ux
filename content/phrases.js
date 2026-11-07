@@ -6,6 +6,7 @@
 // 저장: chrome.storage.local.phrases = { 'ch:<채널ID>': Phrase[], 'global': Phrase[] }
 (() => {
   'use strict';
+  const { t } = globalThis.ytxI18n; // content/i18n.js
 
   if (!/^\/live_chat\/?$/.test(location.pathname)) return; // 다시보기(live_chat_replay)는 전송 불가
 
@@ -236,7 +237,7 @@
   async function insertPhrase(phrase) {
     if (inserting) return;
     const input = inputEl();
-    if (!input) return toast('채팅 입력창을 찾을 수 없습니다');
+    if (!input) return toast(t('inputNotFound'));
     inserting = true;
     let openedPicker = false;
     let fallbackUsed = false;
@@ -280,7 +281,7 @@
       input.focus();
       inserting = false;
     }
-    if (fallbackUsed) console.debug('[관용구] 선택창에서 찾지 못한 이모티콘을 직접 삽입했습니다.');
+    if (fallbackUsed) console.debug('[yt-subs-ux] Inserted emoji images directly because they were not found in the picker.');
   }
 
   // ======================================================================
@@ -447,8 +448,8 @@
       if (!pickerTab) {
         pickerTab = el('button', 'ytph-cat-tab');
         pickerTab.type = 'button';
-        pickerTab.title = '관용구';
-        pickerTab.setAttribute('aria-label', '관용구');
+        pickerTab.title = t('phrases');
+        pickerTab.setAttribute('aria-label', t('phrases'));
         pickerTab.appendChild(makeTabIcon(24));
         pickerTab.addEventListener('click', (e) => {
           e.preventDefault();
@@ -489,17 +490,17 @@
     detectChannelId();
     pickerSec.replaceChildren();
     const title = el('div', 'ytph-cat-title');
-    title.appendChild(el('span', 'ytph-cat-name', '관용구'));
-    const add = el('button', 'ytph-cat-add', '+ 추가');
+    title.appendChild(el('span', 'ytph-cat-name', t('phrases')));
+    const add = el('button', 'ytph-cat-add', t('addButton'));
     add.type = 'button';
-    add.title = '새 관용구 만들기';
+    add.title = t('addButtonTitle');
     add.addEventListener('click', (e) => {
       e.stopPropagation();
       openEditor(null, { tokens: [] });
     });
     title.appendChild(add);
     pickerSec.appendChild(title);
-    pickerSec.appendChild(buildChipList('채팅 메시지의 ☆ 버튼이나 + 추가로 관용구를 등록하세요'));
+    pickerSec.appendChild(buildChipList(t('phrasesEmpty')));
     copyTitleLook(title);
   }
 
@@ -538,7 +539,7 @@
     chip.title =
       (p.name ? p.name + '\n' : '') +
       tokensToPlain(p.tokens) +
-      '\n\n클릭: 입력 · 우클릭: 편집/삭제 · 드래그: 순서 변경';
+      '\n\n' + t('chipHelp');
     if (scope === GLOBAL) chip.classList.add('ytph-global');
     if (p.name) chip.appendChild(el('span', 'ytph-name', p.name));
     const prev = el('span', 'ytph-prev');
@@ -607,10 +608,10 @@
       });
       menu.appendChild(b);
     };
-    add('편집', () => openEditor(p.id));
-    add('복사(텍스트)', () => navigator.clipboard?.writeText(tokensToPlain(p.tokens)).then(() => toast('복사했습니다')));
+    add(t('menuEdit'), () => openEditor(p.id));
+    add(t('menuCopy'), () => navigator.clipboard?.writeText(tokensToPlain(p.tokens)).then(() => toast(t('copied'))));
     add(
-      '삭제',
+      t('menuDelete'),
       () => {
         const f = findPhrase(p.id);
         if (!f) return;
@@ -618,7 +619,7 @@
         if (!store[f.scope].length) delete store[f.scope];
         saveStore();
         renderBar();
-        toast('삭제했습니다');
+        toast(t('deleted'));
       },
       'ytph-danger'
     );
@@ -699,9 +700,9 @@
     const wrap = el('div', 'ytph-pal');
     const tabs = el('div', 'ytph-pal-tabs');
     const search = el('input', 'ytph-input ytph-pal-search');
-    search.placeholder = '이모티콘 검색 (예: heart, smile)';
+    search.placeholder = t('paletteSearch');
     const grid = el('div', 'ytph-pal-grid');
-    grid.appendChild(el('div', 'ytph-empty', '이모티콘을 불러오는 중…'));
+    grid.appendChild(el('div', 'ytph-empty', t('paletteLoading')));
     wrap.append(tabs, search, grid);
 
     /** @type {{head: HTMLElement, box: HTMLElement, cells: {btn: HTMLElement, key: string}[]}[]} */
@@ -750,7 +751,7 @@
           b.addEventListener('click', () => onAdd(p.tokens));
           return { btn: b, key: (p.name + ' ' + tokensToPlain(p.tokens)).toLowerCase() };
         });
-        addTab('관용구', makeTabIcon(20), addSection('관용구', cells, 'ytph-pal-phrases'));
+        addTab(t('phrases'), makeTabIcon(20), addSection(t('phrases'), cells, 'ytph-pal-phrases'));
       }
       cats.forEach((c) => {
         const cells = c.items.map((it) => {
@@ -772,7 +773,7 @@
       });
       if (!cats.length) {
         grid.appendChild(
-          el('div', 'ytph-empty', '이모티콘 목록을 불러오지 못했습니다. 채팅의 이모티콘 버튼을 한 번 누른 뒤 다시 열어 주세요.')
+          el('div', 'ytph-empty', t('paletteFailed'))
         );
       }
     });
@@ -830,13 +831,13 @@
     modal.setAttribute('aria-modal', 'true');
     overlay.appendChild(modal);
 
-    modal.appendChild(el('div', 'ytph-mtitle', editingId ? '관용구 편집' : '관용구 추가'));
+    modal.appendChild(el('div', 'ytph-mtitle', editingId ? t('editorTitleEdit') : t('editorTitleAdd')));
 
     // 이름
     const nameRow = el('label', 'ytph-row');
-    nameRow.appendChild(el('span', 'ytph-lbl', '이름'));
+    nameRow.appendChild(el('span', 'ytph-lbl', t('nameLabel')));
     const nameIn = el('input', 'ytph-input');
-    nameIn.placeholder = '(선택) 예: 장미 탄막';
+    nameIn.placeholder = t('namePlaceholder');
     nameIn.value = state.name;
     nameIn.maxLength = 40;
     nameRow.appendChild(nameIn);
@@ -844,7 +845,7 @@
 
     // 범위
     const scopeRow = el('div', 'ytph-row');
-    scopeRow.appendChild(el('span', 'ytph-lbl', '범위'));
+    scopeRow.appendChild(el('span', 'ytph-lbl', t('scopeLabel')));
     const scopeBox = el('div', 'ytph-seg');
     const mkScope = (value, label) => {
       const b = el('button', 'ytph-segbtn', label);
@@ -858,8 +859,8 @@
       scopeBox.appendChild(b);
       return b;
     };
-    const chanBtn = cs || (state.scope !== GLOBAL) ? mkScope(cs || state.scope, '이 채널 전용') : null;
-    const globBtn = mkScope(GLOBAL, '모든 채널 공용');
+    const chanBtn = cs || (state.scope !== GLOBAL) ? mkScope(cs || state.scope, t('scopeChannel')) : null;
+    const globBtn = mkScope(GLOBAL, t('scopeGlobal'));
     scopeRow.appendChild(scopeBox);
     const scopeHint = el('div', 'ytph-hint');
     modal.appendChild(scopeRow);
@@ -873,14 +874,14 @@
         b.classList.toggle('ytph-on', b.dataset.value === state.scope)
       );
       scopeHint.textContent = custom
-        ? '채널 이모티콘이 들어 있어 이 채널 전용으로만 저장할 수 있습니다.'
+        ? t('scopeHintCustom')
         : !cs && state.scope === GLOBAL
-        ? '채널을 확인할 수 없어 공용으로 저장됩니다. (이모티콘 선택창을 한 번 열면 인식됩니다)'
+        ? t('scopeHintNoChannel')
         : '';
     }
 
     // 토큰
-    modal.appendChild(el('div', 'ytph-lbl ytph-lbl-block', '내용 (드래그: 순서 · ✕: 삭제)'));
+    modal.appendChild(el('div', 'ytph-lbl ytph-lbl-block', t('contentLabel')));
     const tokBox = el('div', 'ytph-tokens');
     modal.appendChild(tokBox);
 
@@ -893,7 +894,7 @@
         renderTokens(item, [tk]);
         const x = el('button', 'ytph-tokx', '✕');
         x.type = 'button';
-        x.title = '삭제';
+        x.title = t('remove');
         x.addEventListener('click', () => {
           state.tokens.splice(i, 1);
           renderTokBox();
@@ -902,7 +903,7 @@
         item.appendChild(x);
         tokBox.appendChild(item);
       });
-      if (!state.tokens.length) tokBox.appendChild(el('span', 'ytph-empty', '비어 있음'));
+      if (!state.tokens.length) tokBox.appendChild(el('span', 'ytph-empty', t('contentEmpty')));
     }
     let dragI = null;
     tokBox.addEventListener('dragstart', (e) => {
@@ -934,8 +935,8 @@
     // 텍스트 추가 / 이모티콘 추가
     const addRow = el('div', 'ytph-row');
     const txtIn = el('input', 'ytph-input');
-    txtIn.placeholder = '텍스트·유니코드 이모티콘 (예: 🥀🎶)';
-    const addTxt = el('button', 'ytph-btn', '추가');
+    txtIn.placeholder = t('textPlaceholder');
+    const addTxt = el('button', 'ytph-btn', t('addText'));
     addTxt.type = 'button';
     const doAddText = () => {
       if (!txtIn.value) return;
@@ -955,7 +956,7 @@
     });
     const undo = el('button', 'ytph-btn', '⌫');
     undo.type = 'button';
-    undo.title = '마지막 하나 지우기';
+    undo.title = t('undoTitle');
     undo.addEventListener('click', () => {
       const last = state.tokens[state.tokens.length - 1];
       // 합성 이모티콘(👨‍👩‍👧, 🇰🇷, 피부색)을 한 글자로 지우도록 grapheme 단위로 자른다
@@ -978,14 +979,14 @@
     modal.appendChild(buildPalette(addFromPalette, editingId));
 
     modal.appendChild(
-      el('div', 'ytph-local', '💾 관용구는 이 브라우저에만(로컬) 저장되며 다른 PC·브라우저와 동기화되지 않습니다.')
+      el('div', 'ytph-local', t('phrasesLocal'))
     );
 
     // 버튼
     const foot = el('div', 'ytph-foot');
-    const cancel = el('button', 'ytph-btn', '취소');
+    const cancel = el('button', 'ytph-btn', t('cancel'));
     cancel.type = 'button';
-    const save = el('button', 'ytph-btn ytph-primary', '저장');
+    const save = el('button', 'ytph-btn ytph-primary', t('save'));
     save.type = 'button';
     foot.append(el('span', 'ytph-spacer'), cancel, save);
     modal.appendChild(foot);
@@ -1007,7 +1008,7 @@
     cancel.addEventListener('click', close);
     save.addEventListener('click', () => {
       if (txtIn.value) doAddText();
-      if (!state.tokens.length) return toast('내용이 비어 있습니다');
+      if (!state.tokens.length) return toast(t('nothingInContent'));
       const phrase = {
         id: editingId || uid(),
         name: nameIn.value.trim(),
@@ -1026,7 +1027,7 @@
       saveStore();
       close();
       renderBar();
-      toast('저장했습니다');
+      toast(t('saved'));
     });
 
     // 입력창 키 이벤트가 유튜브로 새지 않도록
@@ -1048,7 +1049,7 @@
       if (!msg || msg.querySelector(':scope > .ytph-star')) return;
       const star = el('button', 'ytph-star', '☆');
       star.type = 'button';
-      star.title = '이 메시지를 관용구로 저장';
+      star.title = t('starTitle');
       star.addEventListener('click', (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
@@ -1058,7 +1059,7 @@
         const last = tokens[tokens.length - 1];
         if (last && last.t === 'text') last.v = last.v.replace(/\s+$/, '');
         const clean = tokens.filter((tk) => tk.t !== 'text' || tk.v);
-        if (!clean.length) return toast('저장할 내용이 없습니다');
+        if (!clean.length) return toast(t('nothingToSave'));
         openEditor(null, { tokens: clean });
       });
       msg.classList.add('ytph-msg');

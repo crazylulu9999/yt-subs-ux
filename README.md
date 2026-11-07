@@ -15,6 +15,8 @@
 </p>
 <p align="center"><sub>채널 이모티콘 순서 바꾸기 · 채팅의 탄막을 저장해서 보내기 · 이모티콘 팔레트로 관용구 만들기<br>데모의 채널·시청자·이모티콘은 모두 가상입니다.</sub></p>
 
+> 확장 프로그램 화면은 유튜브 표시 언어에 맞춰 한국어·일본어·영어로 나옵니다. (그 밖의 언어는 영어)
+
 ## 기능
 
 ### 이모티콘 순서
@@ -65,7 +67,9 @@
 
 ```
 manifest.json            확장 프로그램 설정 (Manifest V3)
+_locales/                확장 프로그램 이름·설명 (ko/ja/en)
 content/
+  i18n.js                화면 문구 (한국어·일본어·영어)
   theme.js               다크 모드 감지 (<html class="ytx-dark">)
   emoji-order.js / .css  이모티콘 순서
   phrases.js / .css      이모티콘 관용구(탄막)
