@@ -1,12 +1,19 @@
 # yt-subs-ux
 
-[![English](https://img.shields.io/badge/English-lightgrey?style=flat-square)](README.md)
-[![한국어](https://img.shields.io/badge/%ED%95%9C%EA%B5%AD%EC%96%B4-lightgrey?style=flat-square)](README.ko.md)
+[![한국어](https://img.shields.io/badge/%ED%95%9C%EA%B5%AD%EC%96%B4-lightgrey?style=flat-square)](README.md)
 [![日本語](https://img.shields.io/badge/%E6%97%A5%E6%9C%AC%E8%AA%9E-blue?style=flat-square)](README.ja.md)
+[![English](https://img.shields.io/badge/English-lightgrey?style=flat-square)](README.en.md)
 
 YouTube チャンネルの登録者・メンバー向けに、絵文字ピッカーを使いやすくする Chrome 拡張機能です。絵文字の並び順を自由に変えたり、よく使う絵文字の組み合わせやチャットの**弾幕**を保存して、ワンクリックで入力したりできます。
 
 非公式のプロジェクトであり、Google LLC とは関係がなく、Google LLC の承認も受けていません。「YouTube」は Google LLC の商標です。
+
+<p align="center">
+  <img src="docs/demo-order.gif" width="260" alt="チャンネル絵文字の並べ替え">
+  <img src="docs/demo-phrases.gif" width="260" alt="チャットの弾幕を保存して送信">
+  <img src="docs/demo-editor.gif" width="260" alt="絵文字パレットで定型文を作成">
+</p>
+<p align="center"><sub>チャンネル絵文字の並べ替え · チャットの弾幕を保存して送信 · 絵文字パレットで定型文を作成<br>デモのチャンネル・視聴者・絵文字はすべて架空のものです。</sub></p>
 
 > 拡張機能の UI(ボタン・ダイアログ)は現在韓国語のみです。
 
