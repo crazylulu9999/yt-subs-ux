@@ -32,7 +32,7 @@
 
   chrome.storage.onChanged.addListener((ch, area) => {
     if (area !== 'local') return;
-    if (ch[HANDLE_KEY]) handleMap = ch[HANDLE_KEY].newValue || {};
+    if (ch[HANDLE_KEY]) handleMap = { ...handleMap, ...(ch[HANDLE_KEY].newValue || {}) };
     if (ch[STORE_KEY]) store = ch[STORE_KEY].newValue || {};
     if (ch[STORE_KEY]) renderBar();
   });
@@ -62,15 +62,22 @@
   const HANDLE_KEY = 'channelHandles';
   /** @type {Record<string, string>} */
   let handleMap = {};
-  const resolving = new Set(); // 이번 페이지에서 이미 조회한 핸들 (실패해도 다시 조회하지 않음)
+  /** @type {Map<string, {busy: boolean, fails: number, retryAt: number}>} 핸들 조회 상태 */
+  const lookups = new Map();
+  const MAX_LOOKUP_FAILS = 3;
   const isUC = (s) => /^UC[\w-]{22}$/.test(s);
 
-  /** 시청 페이지의 채널 링크 — 채팅의 영상 ID와 같은 영상일 때만 신뢰 */
+  /**
+   * 시청 페이지의 채널 링크. 이 채팅이 그 시청 페이지에 들어 있는 채팅일 때만 쓴다.
+   * (시청 페이지에 들어 있는 채팅의 주소에는 v=가 없다: /live_chat?continuation=...)
+   */
   function ownerFromTopPage() {
     try {
+      const frame = window.frameElement;
+      const flexy = frame && frame.closest('ytd-watch-flexy');
+      if (!flexy) return null; // 팝아웃 채팅 등
       const vid = new URLSearchParams(location.search).get('v');
-      const flexy = window.top.document.querySelector('ytd-watch-flexy');
-      if (!vid || !flexy || flexy.getAttribute('video-id') !== vid) return null;
+      if (vid && flexy.getAttribute('video-id') !== vid) return null;
       const links = flexy.querySelectorAll(
         'ytd-video-owner-renderer a[href^="/channel/UC"], ytd-video-owner-renderer a[href^="/@"]'
       );
@@ -82,54 +89,68 @@
         if (h) return { handle: decodeURIComponent(h[1]).toLowerCase() };
       }
     } catch (_) {
-      /* cross-origin (팝아웃 등) */
+      /* cross-origin 또는 잘못된 인코딩 */
     }
     return null;
   }
 
-  function rememberHandle(handle, uc) {
-    if (!handle || !isUC(uc) || handleMap[handle] === uc) return;
+  async function rememberHandle(handle, uc) {
+    if (!handle || !isUC(uc)) return;
     handleMap = { ...handleMap, [handle]: uc };
-    storageSet({ [HANDLE_KEY]: handleMap });
+    // 다른 탭이 그사이 저장한 항목을 지우지 않도록 저장된 값에 합쳐서 쓴다
+    const saved = (await storageGet(HANDLE_KEY)) || {};
+    if (saved[handle] === uc) return;
+    await storageSet({ [HANDLE_KEY]: { ...saved, [handle]: uc } });
   }
 
-  /** 채널 페이지 HTML의 canonical 링크에서 채널 ID를 찾는다 (앞부분만 읽고 멈춤) */
+  /** 채널 페이지 HTML의 canonical 링크에서 채널 ID를 찾는다 (찾으면 바로 읽기를 멈춤) */
   async function resolveHandle(handle) {
-    if (resolving.has(handle)) return;
-    resolving.add(handle);
+    const st = lookups.get(handle) || { busy: false, fails: 0, retryAt: 0 };
+    lookups.set(handle, st);
+    if (st.busy || st.fails >= MAX_LOOKUP_FAILS || Date.now() < st.retryAt) return;
+    st.busy = true;
+    let uc = null;
     try {
-      const res = await fetch('/' + encodeURIComponent(handle), { credentials: 'omit' });
-      if (!res.ok || !res.body) return;
-      const reader = res.body.getReader();
-      const dec = new TextDecoder();
-      const re = /<link rel="canonical" href="https:\/\/www\.youtube\.com\/channel\/(UC[\w-]{22})"|"externalId":"(UC[\w-]{22})"/;
-      let buf = '';
-      let read = 0;
-      for (;;) {
-        const { done, value } = await reader.read();
-        if (done) break;
-        read += value.length;
-        buf += dec.decode(value, { stream: true });
-        const m = buf.match(re);
-        if (m) {
-          reader.cancel().catch(() => {});
-          rememberHandle(handle, m[1] || m[2]);
-          const prev = channelId;
-          if (detectChannelId() !== prev) renderBar();
-          return;
+      // 쿠키를 함께 보내야 동의 화면(consent.youtube.com)으로 넘어가지 않는다
+      const res = await fetch('/' + encodeURIComponent(handle));
+      if (res.ok && res.body && new URL(res.url).hostname === location.hostname) {
+        const reader = res.body.getReader();
+        const dec = new TextDecoder();
+        const re =
+          /<link rel="canonical" href="https:\/\/www\.youtube\.com\/channel\/(UC[\w-]{22})"|"externalId":"(UC[\w-]{22})"/;
+        let buf = '';
+        let read = 0;
+        for (;;) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          read += value.length;
+          buf += dec.decode(value, { stream: true });
+          const m = buf.match(re);
+          if (m) {
+            uc = m[1] || m[2];
+            break;
+          }
+          if (read > 4e6) break; // 못 찾으면 포기
+          buf = buf.slice(-200); // 청크 경계에 걸친 태그도 찾을 수 있게 끝부분은 남긴다
         }
-        if (read > 4e6) break; // 못 찾으면 포기
-        buf = buf.slice(-200);
+        reader.cancel().catch(() => {});
       }
-      reader.cancel().catch(() => {});
     } catch (_) {
-      /* 네트워크 오류 — 다른 방법으로 판별 */
+      /* 네트워크 오류 — 잠시 뒤 다시 시도 */
     }
+    st.busy = false;
+    if (!uc) {
+      st.fails += 1;
+      st.retryAt = Date.now() + 30000 * 2 ** (st.fails - 1); // 30초, 1분 뒤 재시도
+      return;
+    }
+    await rememberHandle(handle, uc);
+    const prev = channelId;
+    if (detectChannelId() !== prev) renderBar();
   }
 
   function detectChannelId() {
     if (channelConfirmed) return channelId;
-    const owner = ownerFromTopPage();
 
     // 1) 이모티콘 선택창의 채널(커스텀) 카테고리 — 확정 (멤버이거나 채널 이모티콘이 열려 있을 때)
     const img = document.querySelector(
@@ -137,12 +158,11 @@
     );
     if (img) {
       channelConfirmed = true;
-      channelId = img.id.split('/')[0];
-      if (owner && owner.handle) rememberHandle(owner.handle, channelId);
-      return channelId;
+      return (channelId = img.id.split('/')[0]);
     }
 
     // 2) 시청 페이지의 채널 링크 (멤버가 아니어도 됨)
+    const owner = ownerFromTopPage();
     if (owner) {
       if (owner.uc) return (channelId = owner.uc);
       const uc = handleMap[owner.handle];
@@ -433,8 +453,12 @@
   const pickerRoot = () =>
     document.querySelector('yt-live-chat-message-input-renderer yt-emoji-picker-renderer');
 
+  /** 편집창이 열려 있는 동안 채널이 판별되면 범위 버튼을 갱신하는 콜백 */
+  let onChannelChange = null;
+
   function renderBar() {
     renderPickerSection();
+    if (onChannelChange) onChannelChange();
   }
 
   /** 채널 관용구 → 구분선 → 공용 관용구 칩 목록 */
@@ -924,14 +948,33 @@
       b.dataset.value = value;
       b.addEventListener('click', () => {
         if (b.disabled) return;
+        scopeTouched = true;
         state.scope = value;
         syncScope();
       });
       scopeBox.appendChild(b);
       return b;
     };
-    const chanBtn = cs || (state.scope !== GLOBAL) ? mkScope(cs || state.scope, t('scopeChannel')) : null;
+    let scopeTouched = false;
+    let chanBtn = cs || (state.scope !== GLOBAL) ? mkScope(cs || state.scope, t('scopeChannel')) : null;
     const globBtn = mkScope(GLOBAL, t('scopeGlobal'));
+    // 채널 핸들 조회가 끝나기 전에 열었으면, 판별되는 대로 '이 채널 전용'을 추가한다
+    onChannelChange = () => {
+      if (!overlay.isConnected) return void (onChannelChange = null);
+      const ncs = channelScope();
+      if (!ncs || editingId) return; // 기존 관용구 편집 중에는 범위를 바꾸지 않는다
+      if (chanBtn) {
+        // 추정값(채팅 이모티콘)이 더 확실한 값으로 바뀐 경우
+        if (chanBtn.dataset.value === ncs) return;
+        if (state.scope === chanBtn.dataset.value) state.scope = ncs;
+        chanBtn.dataset.value = ncs;
+      } else {
+        chanBtn = mkScope(ncs, t('scopeChannel'));
+        scopeBox.insertBefore(chanBtn, globBtn);
+        if (!scopeTouched) state.scope = ncs;
+      }
+      syncScope();
+    };
     scopeRow.appendChild(scopeBox);
     const scopeHint = el('div', 'ytph-hint');
     modal.appendChild(scopeRow);
@@ -946,7 +989,7 @@
       );
       scopeHint.textContent = custom
         ? t('scopeHintCustom')
-        : !cs && state.scope === GLOBAL
+        : !chanBtn && state.scope === GLOBAL
         ? t('scopeHintNoChannel')
         : '';
     }
