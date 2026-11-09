@@ -60,7 +60,7 @@ To update, replace the files, click the reload (↻) button for this extension i
 ## Limits
 
 - Phrases work in **live chat** only, not in chat replays or comments.
-- The channel is identified from its member emojis in the emoji picker or in chat, or, for chat on a video page, from that video's channel. Opening the emoji picker once usually helps. If the channel can't be identified (for example, in pop-out chat with no channel emojis), phrases can only be saved for all channels.
+- For chat on a video page, the channel is identified from the video's channel link (`@handle`), so you can make `This channel only` phrases **even if you aren't a member**. To get the channel ID, the extension loads that channel's page (youtube.com/@handle) the first time (retrying a little later if that fails) and keeps the result in this browser. It also uses channel member emojis in the emoji picker or in chat. If the channel can't be identified (for example, in pop-out chat with no channel emojis), phrases can only be saved for all channels.
 - If YouTube changes its page structure, buttons or emoji input may stop working.
 
 ## Project structure
